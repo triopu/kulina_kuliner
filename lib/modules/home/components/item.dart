@@ -60,7 +60,8 @@ class _ItemCardState extends State<ItemCard> {
                       child: CircularProgressIndicator(
                           value: downloadProgress.progress),
                     ),
-                    errorWidget: (context, url, error) => Icon(Icons.error),
+                    errorWidget: (context, url, error) =>
+                        Center(child: Icon(Icons.error)),
                   ),
                 ),
               ),
