@@ -27,6 +27,8 @@ class _ItemCardState extends State<ItemCard> {
     return format.format(number);
   }
 
+  String _status = 'minus';
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -123,10 +125,13 @@ class _ItemCardState extends State<ItemCard> {
                               maxValue: 20,
                               onChanged: (value) {
                                 widget.product.amount = value;
-                                widget.notifyParent(
-                                  widget.product,
-                                );
+                                widget.notifyParent(widget.product, _status);
                                 setState(() {});
+                              },
+                              onStatus: (value) {
+                                setState(() {
+                                  _status = value;
+                                });
                               },
                             ),
                           )
@@ -145,9 +150,7 @@ class _ItemCardState extends State<ItemCard> {
                                 splashColor: Colors.blueAccent,
                                 onPressed: () {
                                   widget.product.amount = 1;
-                                  widget.notifyParent(
-                                    widget.product,
-                                  );
+                                  widget.notifyParent(widget.product, 'plus');
                                   setState(() {});
                                 },
                                 borderSide: BorderSide(color: Colors.blue),

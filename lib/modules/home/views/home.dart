@@ -81,10 +81,11 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  _upProduct(ProductData data) async {
-    if (data.amount == 0) await dbHelper.delete(data.id);
-    if (data.amount == 1) await dbHelper.insert(data);
-    if (data.amount > 1) await dbHelper.update(data);
+  _upProduct(ProductData data, String status) async {
+    if (status == 'minus') await dbHelper.delete(data.id);
+    if (data.amount == 1 && status == 'plus') await dbHelper.insert(data);
+    if (data.amount > 1 && status == 'plus') await dbHelper.update(data);
+    _countProduct();
   }
 
   _countProduct() {
