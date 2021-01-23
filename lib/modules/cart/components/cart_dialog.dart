@@ -6,14 +6,10 @@ import 'package:flutter/cupertino.dart';
 class CartDialog extends StatefulWidget {
   final int price;
   final int total;
-  final DateTime date;
-  final Function updateParent;
   const CartDialog({
     Key key,
     this.price,
     this.total,
-    this.date,
-    this.updateParent,
   }) : super(key: key);
   @override
   _CartDialogState createState() => _CartDialogState();
@@ -49,26 +45,25 @@ class _CartDialogState extends State<CartDialog> {
                     children: [
                       Text(
                         widget.total.toString() +
-                            " Item: " +
+                            " Item | " +
                             "Rp. ${_formatNumber(widget.price)}",
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       Text("Termasuk ongkos kirim")
                     ],
                   ),
-                  IconButton(
-                      icon: Icon(CupertinoIcons.cart),
-                      onPressed: () {
-                        print('Date from: ' + widget.date.toString());
-                        Navigator.of(context)
-                            .push(
-                              new MaterialPageRoute(
-                                  builder: (_) => new CartView(
-                                        date: widget.date,
-                                      )),
-                            )
-                            .then((val) => val ? widget.updateParent() : null);
-                      })
+                  FlatButton(
+                    color: Colors.transparent,
+                    onPressed: () {},
+                    child: new Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        new Text('CHECKOUT'),
+                        new Icon(CupertinoIcons.chevron_right),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),

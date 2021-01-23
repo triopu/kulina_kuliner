@@ -73,18 +73,30 @@ class _HomeScreenState extends State<HomeScreen> {
 
   _matchProduct() {
     _products.asMap().forEach((index, value) {
+      bool checked = false;
       _cart.asMap().forEach((idx, val) {
         if (val.id == value.id) {
           _products[index] = val;
+          checked = true;
         }
       });
+      if (!checked && value.amount > 0) _products[index].amount = 0;
     });
+
+    if (_cart.length == 0) {
+      _products.asMap().forEach((key, value) {
+        _products[key].amount = 0;
+      });
+    }
+    setState(() {});
   }
 
   _upProduct(ProductData data, String status) async {
-    if (status == 'minus') await dbHelper.delete(data.id);
+    if (status == 'minus' && data.amount == 0) await dbHelper.delete(data.id);
+    if (status == 'minus' && data.amount > 0) await dbHelper.update(data);
     if (data.amount == 1 && status == 'plus') await dbHelper.insert(data);
     if (data.amount > 1 && status == 'plus') await dbHelper.update(data);
+    _getDatabase();
     _countProduct();
   }
 
@@ -107,6 +119,7 @@ class _HomeScreenState extends State<HomeScreen> {
       Future<List<ProductData>> cartListFuture = dbHelper.cart();
       cartListFuture.then((cartList) {
         setState(() {
+          print("Success get Database");
           _cart = cartList;
           _countProduct();
           _matchProduct();
@@ -263,26 +276,31 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             Expanded(
               child: Stack(children: [
-                LazyLoadScrollView(
-                  isLoading: isLoading,
-                  onEndOfPage: () => _loadProducts(),
-                  child: GridView.builder(
-                      itemCount: _products.length,
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        mainAxisSpacing: 20,
-                        crossAxisSpacing: 20,
-                        childAspectRatio: 0.75,
-                      ),
-                      itemBuilder: (context, index) => ItemCard(
-                            product: _products[index],
-                            press: () => {},
-                            notifyParent: _upProduct,
-                          )),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 50),
+                  child: LazyLoadScrollView(
+                    isLoading: isLoading,
+                    onEndOfPage: () => _loadProducts(),
+                    child: GridView.builder(
+                        itemCount: _products.length,
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          mainAxisSpacing: 20,
+                          crossAxisSpacing: 20,
+                          childAspectRatio: 0.75,
+                        ),
+                        itemBuilder: (context, index) => ItemCard(
+                              product: _products[index],
+                              press: () => {},
+                              notifyParent: _upProduct,
+                            )),
+                  ),
                 ),
                 CartDialog(
                   price: _totalPrice,
                   total: _numberProduct,
+                  date: _selectedValue,
+                  updateParent: _getDatabase,
                 ),
               ]),
             ),
