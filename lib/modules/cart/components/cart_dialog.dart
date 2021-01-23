@@ -54,7 +54,9 @@ class _CartDialogState extends State<CartDialog> {
                   ),
                   FlatButton(
                     color: Colors.transparent,
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.pop(context, true);
+                    },
                     child: new Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       mainAxisSize: MainAxisSize.min,
