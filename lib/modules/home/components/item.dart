@@ -50,11 +50,15 @@ class _ItemCardState extends State<ItemCard> {
                     imageBuilder: (context, imageProvider) => Container(
                       decoration: BoxDecoration(
                         image: DecorationImage(
-                            image: imageProvider,
-                            fit: BoxFit.cover,
-                            colorFilter: ColorFilter.mode(
-                                Colors.red, BlendMode.colorBurn)),
+                          image: imageProvider,
+                          fit: BoxFit.cover,
+                        ),
                       ),
+                    ),
+                    progressIndicatorBuilder:
+                        (context, url, downloadProgress) => Center(
+                      child: CircularProgressIndicator(
+                          value: downloadProgress.progress),
                     ),
                     errorWidget: (context, url, error) => Icon(Icons.error),
                   ),

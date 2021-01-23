@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:kulinakuliner/modules/cart/components/cart_dialog.dart';
+import 'package:kulinakuliner/modules/cart/components/empty_cart.dart';
 import 'package:kulinakuliner/modules/cart/components/item.dart';
 import 'package:kulinakuliner/modules/home/models/product.dart';
 import 'package:kulinakuliner/utils/local_storage_service.dart';
@@ -105,70 +106,74 @@ class _CartViewState extends State<CartView> {
       ),
       body: Container(
         color: Colors.white,
-        child: Container(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: _cart.length > 0
+            ? Container(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Text(
-                      'Daftar Pesanan',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Daftar Pesanan',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          TextButton(
+                              child: Text(
+                                'Hapus Pesanan',
+                                style: TextStyle(color: Colors.black45),
+                              ),
+                              onPressed: () {
+                                _delAll();
+                              }),
+                        ],
+                      ),
                     ),
-                    TextButton(
-                        child: Text(
-                          'Hapus Pesanan',
-                          style: TextStyle(color: Colors.black45),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+                      child: Text(
+                        '$_selectedDay',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, color: Colors.black),
+                      ),
+                    ),
+                    Expanded(
+                      child: Stack(children: [
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 50),
+                          child: LazyLoadScrollView(
+                            isLoading: isLoading,
+                            onEndOfPage: () {},
+                            child: GridView.builder(
+                                itemCount: _cart.length,
+                                gridDelegate:
+                                    SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 1,
+                                  mainAxisSpacing: 5,
+                                  childAspectRatio: 3,
+                                ),
+                                itemBuilder: (context, index) => ItemCard(
+                                      product: _cart[index],
+                                      press: () => {},
+                                      notifyParent: _upProduct,
+                                    )),
+                          ),
                         ),
-                        onPressed: () {
-                          _delAll();
-                        }),
+                        CartDialog(
+                          price: _totalPrice,
+                          total: _numberProduct,
+                        ),
+                      ]),
+                    ),
                   ],
                 ),
+              )
+            : Container(
+                child: EmptyCart(),
               ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
-                child: Text(
-                  '$_selectedDay',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.black),
-                ),
-              ),
-              Expanded(
-                child: Stack(children: [
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 50),
-                    child: LazyLoadScrollView(
-                      isLoading: isLoading,
-                      onEndOfPage: () {},
-                      child: GridView.builder(
-                          itemCount: _cart.length,
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 1,
-                            mainAxisSpacing: 5,
-                            childAspectRatio: 3,
-                          ),
-                          itemBuilder: (context, index) => ItemCard(
-                                product: _cart[index],
-                                press: () => {},
-                                notifyParent: _upProduct,
-                              )),
-                    ),
-                  ),
-                  CartDialog(
-                    price: _totalPrice,
-                    total: _numberProduct,
-                  ),
-                ]),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }

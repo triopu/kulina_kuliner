@@ -38,6 +38,7 @@ dependencies:
   smooth_star_rating: 1.1.1
   sqflite:
   path:
+  flutter_easyloading: ^2.2.2
 
 dev_dependencies:
   flutter_test:
