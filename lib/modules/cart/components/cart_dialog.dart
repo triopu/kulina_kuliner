@@ -32,9 +32,9 @@ class _CartDialogState extends State<CartDialog> {
         right: 0,
         left: 0,
         child: Padding(
-          padding: EdgeInsets.all(10),
+          padding: EdgeInsets.all(8),
           child: Container(
-            color: Colors.lightBlueAccent,
+            color: Colors.lightBlue,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: Row(

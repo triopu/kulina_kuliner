@@ -10,6 +10,7 @@ import 'package:kulinakuliner/modules/home/models/product.dart';
 import 'package:kulinakuliner/utils/local_storage_service.dart';
 import 'package:lazy_load_scrollview/lazy_load_scrollview.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:grouped_list/grouped_list.dart';
 
 class CartView extends StatefulWidget {
   final DateTime date;
@@ -22,26 +23,23 @@ class CartView extends StatefulWidget {
 }
 
 class _CartViewState extends State<CartView> {
-  String _selectedDay = '';
   DbHelper dbHelper = DbHelper();
   List<ProductData> _cart = [];
   int _numberProduct = 0;
   int _totalPrice = 0;
   bool isLoading = true;
 
-  _getDate(DateTime date) {
+  _getDate(String dateStr) {
     initializeDateFormatting();
+    DateTime date = DateTime.parse(dateStr);
     final DateFormat formatter = DateFormat.yMMMMEEEEd("id_ID");
     final String formatted = formatter.format(date.toLocal());
-    setState(() {
-      _selectedDay = formatted;
-    });
+    return formatted;
   }
 
   @override
   void initState() {
     super.initState();
-    _getDate(widget.date);
     _getDatabase();
   }
 
@@ -59,8 +57,8 @@ class _CartViewState extends State<CartView> {
   }
 
   _upProduct(ProductData data, String status) async {
-    if (status == 'delete') await dbHelper.delete(data.id);
-    if (status == 'minus' && data.amount == 0) await dbHelper.delete(data.id);
+    if (status == 'delete') await dbHelper.delete(data);
+    if (status == 'minus' && data.amount == 0) await dbHelper.delete(data);
     if (status == 'minus' && data.amount > 0) await dbHelper.update(data);
     if (data.amount == 1 && status == 'plus') await dbHelper.insert(data);
     if (data.amount > 1 && status == 'plus') await dbHelper.update(data);
@@ -70,7 +68,7 @@ class _CartViewState extends State<CartView> {
 
   _delAll() {
     _cart.forEach((element) {
-      dbHelper.delete(element.id);
+      dbHelper.delete(element);
     });
     _getDatabase();
     _countProduct();
@@ -92,7 +90,7 @@ class _CartViewState extends State<CartView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Review Balasan',
+        title: Text('Keranjang Pesanan',
             style: TextStyle(color: Colors.black, fontSize: 15)),
         backgroundColor: Colors.white,
         iconTheme: IconThemeData(
@@ -132,34 +130,28 @@ class _CartViewState extends State<CartView> {
                         ],
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
-                      child: Text(
-                        '$_selectedDay',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, color: Colors.black),
-                      ),
-                    ),
                     Expanded(
                       child: Stack(children: [
                         Padding(
                           padding: const EdgeInsets.only(bottom: 50),
-                          child: LazyLoadScrollView(
-                            isLoading: isLoading,
-                            onEndOfPage: () {},
-                            child: GridView.builder(
-                                itemCount: _cart.length,
-                                gridDelegate:
-                                    SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 1,
-                                  mainAxisSpacing: 5,
-                                  childAspectRatio: 3,
-                                ),
-                                itemBuilder: (context, index) => ItemCard(
-                                      product: _cart[index],
-                                      press: () => {},
-                                      notifyParent: _upProduct,
-                                    )),
+                          child: GroupedListView<dynamic, String>(
+                            elements: _cart,
+                            groupBy: (element) => element.date,
+                            groupSeparatorBuilder: (String groupByValue) =>
+                                Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Text(
+                                _getDate(groupByValue),
+                                style: TextStyle(fontWeight: FontWeight.w900),
+                              ),
+                            ),
+                            itemBuilder: (context, dynamic element) => ItemCard(
+                              product: element,
+                              press: () => {},
+                              notifyParent: _upProduct,
+                            ),
+                            floatingHeader: true, // optional
+                            order: GroupedListOrder.ASC, // optional
                           ),
                         ),
                         CartDialog(

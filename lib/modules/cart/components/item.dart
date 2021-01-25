@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
 import 'package:kulinakuliner/modules/home/models/product.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -35,34 +36,37 @@ class _ItemCardState extends State<ItemCard> {
     return Padding(
       padding: const EdgeInsets.all(5),
       child: Card(
+        elevation: 5,
         child: Container(
           width: double.infinity,
-          height: double.infinity,
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Expanded(
                   flex: 1,
-                  child: Container(
-                    padding: EdgeInsets.all(10),
-                    child: CachedNetworkImage(
-                      imageUrl: widget.product.imageUrl,
-                      imageBuilder: (context, imageProvider) => Container(
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image: imageProvider,
-                            fit: BoxFit.cover,
+                  child: Padding(
+                    padding: const EdgeInsets.all(3.0),
+                    child: Container(
+                      height: 110,
+                      padding: EdgeInsets.all(10),
+                      child: CachedNetworkImage(
+                        imageUrl: widget.product.imageUrl,
+                        imageBuilder: (context, imageProvider) => Container(
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                              image: imageProvider,
+                              fit: BoxFit.cover,
+                            ),
                           ),
                         ),
+                        progressIndicatorBuilder:
+                            (context, url, downloadProgress) => Center(
+                          child: CircularProgressIndicator(
+                              value: downloadProgress.progress),
+                        ),
+                        errorWidget: (context, url, error) =>
+                            Center(child: Icon(Icons.error)),
                       ),
-                      progressIndicatorBuilder:
-                          (context, url, downloadProgress) => Center(
-                        child: CircularProgressIndicator(
-                            value: downloadProgress.progress),
-                      ),
-                      errorWidget: (context, url, error) =>
-                          Center(child: Icon(Icons.error)),
                     ),
                   )),
               Expanded(

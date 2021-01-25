@@ -9,6 +9,7 @@ class ProductData {
   final int price;
   final double rating;
   int amount;
+  String date;
 
   ProductData(
       {this.id,
@@ -18,9 +19,12 @@ class ProductData {
       this.packageName,
       this.price,
       this.rating,
-      this.amount});
+      this.amount,
+      this.date});
 
   factory ProductData.fromJson(Map<String, dynamic> json) {
+    DateTime today = new DateTime(
+        DateTime.now().year, DateTime.now().month, DateTime.now().day);
     return ProductData(
       id: json['id'],
       name: json['name'],
@@ -30,6 +34,7 @@ class ProductData {
       price: json['price'],
       rating: json['rating'],
       amount: json['amount'] ?? 0,
+      date: json['date'] ?? today.toString(),
     );
   }
   static Map<String, dynamic> toMap(ProductData productData) => {
@@ -41,6 +46,7 @@ class ProductData {
         'price': productData.price,
         'rating': productData.rating,
         'amount': productData.amount,
+        'date': productData.date,
       };
 
   static String encode(List<ProductData> productData) => json.encode(

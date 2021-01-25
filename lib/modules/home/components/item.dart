@@ -36,6 +36,7 @@ class _ItemCardState extends State<ItemCard> {
       child: Padding(
         padding: const EdgeInsets.all(5),
         child: Card(
+          elevation: 3,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
@@ -49,11 +50,11 @@ class _ItemCardState extends State<ItemCard> {
                     imageUrl: widget.product.imageUrl,
                     imageBuilder: (context, imageProvider) => Container(
                       decoration: BoxDecoration(
-                        image: DecorationImage(
-                          image: imageProvider,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
+                          image: DecorationImage(
+                            image: imageProvider,
+                            fit: BoxFit.cover,
+                          ),
+                          borderRadius: BorderRadius.circular(5)),
                     ),
                     progressIndicatorBuilder:
                         (context, url, downloadProgress) => Center(
@@ -82,7 +83,7 @@ class _ItemCardState extends State<ItemCard> {
                         SmoothStarRating(
                           starCount: 5,
                           rating: widget.product.rating,
-                          size: 20,
+                          size: 15,
                           isReadOnly: true,
                           color: Colors.orange,
                         ),

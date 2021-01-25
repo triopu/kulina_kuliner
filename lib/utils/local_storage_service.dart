@@ -87,7 +87,7 @@ class DbHelper {
 
   void _createDb(Database db, int version) async {
     await db.execute('''
-      CREATE TABLE Cart(id INTEGER PRIMARY KEY, name TEXT, image_url TEXT, brand_name TEXT, package_name TEXT, price INTEGER, rating DOUBLE, amount INTEGER, value INTEGER, num REAL)
+      CREATE TABLE Cart(id INTEGER, name TEXT, image_url TEXT, brand_name TEXT, package_name TEXT, price INTEGER, rating DOUBLE, amount INTEGER, date TEXT)
     ''');
   }
 
@@ -100,7 +100,7 @@ class DbHelper {
 
   Future<List<Map<String, dynamic>>> select() async {
     Database db = await this.database;
-    var mapList = await db.query('cart', orderBy: 'id');
+    var mapList = await db.query('cart', orderBy: 'date');
     return mapList;
   }
 
@@ -113,13 +113,14 @@ class DbHelper {
   Future<int> update(ProductData object) async {
     Database db = await this.database;
     int count = await db.update('cart', ProductData.toMap(object),
-        where: 'id=?', whereArgs: [object.id]);
+        where: 'id=? and date=?', whereArgs: [object.id, object.date]);
     return count;
   }
 
-  Future<int> delete(int id) async {
+  Future<int> delete(ProductData object) async {
     Database db = await this.database;
-    int count = await db.delete('cart', where: 'id=?', whereArgs: [id]);
+    int count = await db.delete('cart',
+        where: 'id=? and date=?', whereArgs: [object.id, object.date]);
     return count;
   }
 
@@ -135,7 +136,8 @@ class DbHelper {
           packageName: maps[i]['package_name'],
           price: maps[i]['price'],
           rating: maps[i]['rating'],
-          amount: maps[i]['amount']);
+          amount: maps[i]['amount'],
+          date: maps[i]['date']);
     });
   }
 }

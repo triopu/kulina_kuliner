@@ -44,7 +44,6 @@ class _NumericStepButtonState extends State<NumericStepButton> {
                 if (widget.input > widget.minValue) {
                   widget.input--;
                 }
-                print("Triggered " + widget.input.toString());
                 widget.onStatus('minus');
                 widget.onChanged(widget.input);
               });

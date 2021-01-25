@@ -34,6 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   int _numberProduct = 0;
   int _totalPrice = 0;
+  double _padding = 0.0;
 
   DbHelper dbHelper = DbHelper();
 
@@ -44,6 +45,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final String formatted = formatter.format(now.toLocal());
     setState(() {
       _selectedDay = formatted;
+      _getDatabase();
     });
   }
 
@@ -95,12 +97,16 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   _upProduct(ProductData data, String status) async {
-    if (status == 'minus' && data.amount == 0) await dbHelper.delete(data.id);
+    if (status == 'minus' && data.amount == 0) await dbHelper.delete(data);
     if (status == 'minus' && data.amount > 0) await dbHelper.update(data);
-    if (data.amount == 1 && status == 'plus') await dbHelper.insert(data);
+    if (data.amount == 1 && status == 'plus') {
+      data.date = DateTime(
+              _selectedValue.year, _selectedValue.month, _selectedValue.day)
+          .toString();
+      await dbHelper.insert(data);
+    }
     if (data.amount > 1 && status == 'plus') await dbHelper.update(data);
     _getDatabase();
-    _countProduct();
   }
 
   _countProduct() {
@@ -113,6 +119,7 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _totalPrice = price;
       _numberProduct = total;
+      _padding = _numberProduct > 0 ? 50 : 0.0;
     });
   }
 
@@ -122,8 +129,14 @@ class _HomeScreenState extends State<HomeScreen> {
       Future<List<ProductData>> cartListFuture = dbHelper.cart();
       cartListFuture.then((cartList) {
         setState(() {
-          print("Success get Database");
-          _cart = cartList;
+          List<ProductData> _dataCart = [];
+          cartList.forEach((element) {
+            if (element.date ==
+                DateTime(_selectedValue.year, _selectedValue.month,
+                        _selectedValue.day)
+                    .toString()) _dataCart.add(element);
+          });
+          _cart = _dataCart;
           _countProduct();
           _matchProduct();
         });
@@ -149,7 +162,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
+      statusBarColor: Colors.lightBlue,
     ));
     return Scaffold(
         appBar: AppBar(
@@ -157,8 +170,9 @@ class _HomeScreenState extends State<HomeScreen> {
           elevation: 0,
           leading: IconButton(
               icon: Icon(
-            CupertinoIcons.arrow_left,
-            size: 25,
+            Icons.restaurant,
+            size: 30,
+            color: Colors.lightBlue,
           )),
           title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -203,7 +217,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       height: 80,
                       controller: _controller,
                       initialSelectedDate: DateTime.now(),
-                      selectionColor: Colors.black12,
+                      selectionColor: Colors.lightBlue,
                       selectedTextColor: Colors.white,
                       inactiveDates: days,
                       daysCount: 30,
@@ -227,7 +241,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             IconButton(
                                 icon: Icon(
                                   CupertinoIcons.chevron_left_circle_fill,
-                                  color: Colors.blue,
+                                  color: Colors.black45,
                                 ),
                                 onPressed: () {
                                   _controller.animateToDate(
@@ -242,7 +256,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             IconButton(
                                 icon: Icon(
                                   CupertinoIcons.chevron_right_circle_fill,
-                                  color: Colors.blue,
+                                  color: Colors.black45,
                                 ),
                                 onPressed: () {
                                   _controller.animateToDate(
@@ -280,7 +294,9 @@ class _HomeScreenState extends State<HomeScreen> {
               Expanded(
                 child: Stack(children: [
                   Padding(
-                    padding: const EdgeInsets.only(bottom: 50),
+                    padding: EdgeInsets.only(
+                      bottom: _padding,
+                    ),
                     child: LazyLoadScrollView(
                       isLoading: isLoading,
                       onEndOfPage: () => _loadProducts(),
@@ -300,12 +316,13 @@ class _HomeScreenState extends State<HomeScreen> {
                               )),
                     ),
                   ),
-                  CartDialog(
-                    price: _totalPrice,
-                    total: _numberProduct,
-                    date: _selectedValue,
-                    updateParent: _getDatabase,
-                  ),
+                  if (_numberProduct > 0)
+                    CartDialog(
+                      price: _totalPrice,
+                      total: _numberProduct,
+                      date: _selectedValue,
+                      updateParent: _getDatabase,
+                    ),
                 ]),
               ),
             ],
